@@ -1,0 +1,88 @@
+.auth-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, var(--bg) 0%, var(--bg2) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  position: relative;
+}
+
+.auth-theme-btn {
+  position: fixed;
+  top: 1.2rem;
+  right: 1.5rem;
+  z-index: 100;
+}
+
+.auth-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  padding: 2.5rem 2rem;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: var(--card-shadow);
+  animation: fadeInUp 0.5s ease both;
+}
+
+.auth-logo { text-align: center; font-size: 2.5rem; margin-bottom: 0.3rem; }
+.auth-title { text-align: center; font-size: 1.7rem; font-weight: 800; color: var(--text); margin-bottom: 0.3rem; }
+.auth-subtitle { text-align: center; color: var(--text2); font-size: 0.9rem; margin-bottom: 1.8rem; }
+
+.auth-form { display: flex; flex-direction: column; gap: 1rem; }
+
+.form-group { display: flex; flex-direction: column; gap: 0.4rem; }
+.form-group label { font-size: 0.88rem; font-weight: 600; color: var(--text2); }
+
+.form-input {
+  background: var(--input-bg);
+  border: 1.5px solid var(--border);
+  border-radius: 12px;
+  padding: 0.75rem 1rem;
+  font-size: 0.95rem;
+  color: var(--text);
+  transition: border-color 0.2s, box-shadow 0.2s;
+  outline: none;
+  width: 100%;
+}
+.form-input::placeholder { color: var(--placeholder); }
+.form-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--shadow); }
+.form-input.error { border-color: #e74c3c; }
+
+.field-error { font-size: 0.8rem; color: #e74c3c; }
+
+.auth-submit { margin-top: 0.5rem; width: 100%; padding: 0.85rem; font-size: 1rem; }
+
+.auth-footer { text-align: center; margin-top: 1.2rem; font-size: 0.9rem; color: var(--text2); }
+.auth-footer a { color: var(--accent); font-weight: 600; transition: opacity 0.2s; }
+.auth-footer a:hover { opacity: 0.75; }
+
+.auth-back {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: none;
+  border: none;
+  color: var(--text2);
+  cursor: pointer;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+  padding: 0;
+  transition: color 0.2s;
+}
+.auth-back:hover { color: var(--accent); }
+
+.password-wrapper { position: relative; }
+.password-wrapper .form-input { padding-right: 3rem; }
+.toggle-pw {
+  position: absolute;
+  right: 0.8rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.1rem;
+  color: var(--text2);
+}
