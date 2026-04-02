@@ -48,13 +48,14 @@ const mealSearch = async (query) => {
 };
 
 const mealPopular = async () => {
-  // Fetch Indian + many categories for a rich 24-dish popular feed
-  const areas = ['Indian', 'Chinese', 'Japanese', 'Mexican', 'Italian', 'French'];
-  const categories = ['Chicken', 'Seafood', 'Pasta', 'Dessert', 'Vegetarian', 'Lamb', 'Beef', 'Pork'];
+  // Indian-first trending feed — no beef/pork
+  const areas = ['Indian', 'Chinese', 'Japanese', 'Mexican', 'Italian'];
+  const categories = ['Chicken', 'Seafood', 'Pasta', 'Dessert', 'Vegetarian'];
 
-  const areaFetches = areas.map(a =>
+  // Indian gets 8 dishes, others get 2 each
+  const areaFetches = areas.map((a, idx) =>
     meal.get('/filter.php', { params: { a } })
-      .then(r => (r.data.meals || []).slice(0, 3).map(m => ({
+      .then(r => (r.data.meals || []).slice(0, idx === 0 ? 8 : 2).map(m => ({
         id: m.idMeal, title: m.strMeal, image: m.strMealThumb,
         summary: '', readyInMinutes: null, servings: null, healthScore: 0,
         cuisines: [a], dishTypes: [],
@@ -71,13 +72,14 @@ const mealPopular = async () => {
   );
 
   const all = await Promise.all([...areaFetches, ...catFetches]);
-  // Deduplicate by id, shuffle a bit, return up to 24
+
   const seen = new Set();
   const flat = all.flat().filter(m => {
     if (seen.has(m.id)) return false;
     seen.add(m.id);
     return true;
   });
+
   return flat.slice(0, 24);
 };
 
