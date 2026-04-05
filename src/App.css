@@ -48,11 +48,20 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
-  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  font-family: 'Pacifico', 'Segoe UI', system-ui, sans-serif;
   background: var(--bg);
   color: var(--text);
   transition: background 0.4s, color 0.4s;
   min-height: 100vh;
+}
+
+/* Poppins for all headings */
+h1, h2, h3, h4, h5, h6,
+.hero-title, .landing-title, .auth-title,
+.more-title, .section-title, .section-heading,
+.detail-title, .profile-name, .card-title,
+.nav-brand, .brand-text {
+  font-family: 'Poppins', system-ui, sans-serif;
 }
 
 a { text-decoration: none; color: inherit; }
