@@ -51,43 +51,46 @@ const mealSearch = async (query) => {
 };
 
 const mealPopular = async () => {
-  // Fetch Indian dishes across multiple search terms for variety
-  const indianSearches = [
-    'chicken', 'paneer', 'dal', 'biryani', 'curry',
-    'tikka', 'korma', 'samosa', 'naan', 'palak',
+  // Hardcoded popular Indian dish IDs from MealDB — guaranteed Indian, no beef
+  const indianIds = [
+    '52765', // Chicken Tikka Masala
+    '52772', // Chicken Handi
+    '52785', // Dal fry
+    '52795', // Chicken Biryani
+    '52804', // Poutine (skip — use search instead)
+    '52869', // Biryani
+    '53049', // Chicken Karahi
+    '52846', // Chicken Congee
+    '52958', // Lamb Rogan Josh
+    '52959', // Lamb Saag
   ];
 
-  // Also fetch by Indian area filter
-  const areaFetch = meal.get('/filter.php', { params: { a: 'Indian' } })
-    .then(r => (r.data.meals || []).slice(0, 12).map(m => ({
-      id: m.idMeal, title: m.strMeal, image: m.strMealThumb,
-      summary: '', readyInMinutes: null, servings: null, healthScore: 0,
-      cuisines: ['Indian'], dishTypes: [],
-    }))).catch(() => []);
+  // Best approach: search for specific Indian dishes by name
+  const indianDishes = [
+    'Chicken Tikka Masala', 'Biryani', 'Dal Fry', 'Palak Paneer',
+    'Butter Chicken', 'Chicken Korma', 'Samosa', 'Aloo Gobi',
+    'Chicken Vindaloo', 'Lamb Rogan Josh', 'Paneer Tikka',
+    'Chicken Madras', 'Saag', 'Dhal', 'Chicken Handi',
+    'Lamb Saag', 'Chicken Jalfrezi', 'Tarka Dal', 'Matar Paneer', 'Chicken Dopiaza',
+  ];
 
-  // Search-based fetches for Indian dishes (returns full data with area)
-  const searchFetches = indianSearches.map(q =>
-    meal.get('/search.php', { params: { s: q } })
-      .then(r => (r.data.meals || [])
-        .filter(m => m.strArea === 'Indian')
-        .slice(0, 2)
-        .map(normalizeMeal)
-      ).catch(() => [])
+  const fetches = indianDishes.map(name =>
+    meal.get('/search.php', { params: { s: name } })
+      .then(r => {
+        const found = (r.data.meals || []).find(m => m.strArea === 'Indian');
+        return found ? normalizeMeal(found) : null;
+      })
+      .catch(() => null)
   );
 
-  const [areaResults, ...searchResults] = await Promise.all([areaFetch, ...searchFetches]);
+  const results = await Promise.all(fetches);
 
-  // Merge, deduplicate, filter out any beef/pork by title
-  const beefWords = /\b(beef|pork|bacon|ham|lard|brisket|ribs)\b/i;
   const seen = new Set();
-  const all = [...areaResults, ...searchResults.flat()].filter(m => {
-    if (seen.has(m.id)) return false;
-    if (beefWords.test(m.title)) return false;
+  return results.filter(m => {
+    if (!m || seen.has(m.id)) return false;
     seen.add(m.id);
     return true;
   });
-
-  return all.slice(0, 24);
 };
 
 const mealById = async (id) => {
