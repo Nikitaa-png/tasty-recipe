@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import './RecipeBot.css';
 
 const GEMINI_KEY = import.meta.env.VITE_GEMINI_KEY || 'AIzaSyDbVREIhMW64-aw0A01KUArR9EvF0YzugI';
-const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_KEY}`;
+const API_URL = `https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent?key=${GEMINI_KEY}`;
 
 const SYSTEM_PROMPT = `You are Tasty, a friendly AI recipe assistant for the Tasty Recipe app.
 Your job is to:
@@ -58,26 +58,24 @@ export default function RecipeBot() {
     setLoading(true);
 
     try {
-      // Build conversation history (exclude the initial greeting)
-      const history = newMessages.slice(1).map(m => ({
-        role: m.role === 'assistant' ? 'model' : 'user',
-        parts: [{ text: m.text }],
-      }));
+      // Build conversation — system prompt as first user turn for v1 compatibility
+      const history = [
+        { role: 'user',  parts: [{ text: SYSTEM_PROMPT }] },
+        { role: 'model', parts: [{ text: "Got it! I'm Tasty, your recipe assistant. How can I help?" }] },
+        ...newMessages.slice(1).map(m => ({
+          role: m.role === 'assistant' ? 'model' : 'user',
+          parts: [{ text: m.text }],
+        })),
+      ];
 
       const res = await fetch(API_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          system_instruction: {
-            parts: [{ text: SYSTEM_PROMPT }],
-          },
-          contents: history,
-        }),
+        body: JSON.stringify({ contents: history }),
       });
 
       const data = await res.json();
 
-      // Log error details if any
       if (data.error) {
         console.error('Gemini error:', data.error);
         throw new Error(data.error.message);
@@ -91,7 +89,7 @@ export default function RecipeBot() {
       console.error('Bot error:', err);
       setMessages(prev => [...prev, {
         role: 'assistant',
-        text: `Oops! Something went wrong: ${err.message || 'Unknown error'}. Please try again.`,
+        text: `Oops! ${err.message || 'Something went wrong'}. Please try again.`,
       }]);
     } finally {
       setLoading(false);
