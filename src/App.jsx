@@ -12,6 +12,7 @@ import Profile from './pages/Profile';
 import Community from './pages/Community';
 import CommunityDetail from './pages/CommunityDetail';
 import AddRecipe from './pages/AddRecipe';
+import RecipeBot from './components/RecipeBot';
 import './App.css';
 
 function App() {
@@ -85,6 +86,7 @@ function App() {
         <Route path="/add-recipe" element={guard(<AddRecipe user={user} onLogout={handleLogout} />)} />
         <Route path="*"           element={<Navigate to="/" replace />} />
       </Routes>
+      {user && <RecipeBot />}
     </ThemeProvider>
   );
 }
