@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import './RecipeBot.css';
 
 const GEMINI_KEY = import.meta.env.VITE_GEMINI_KEY || 'AIzaSyDbVREIhMW64-aw0A01KUArR9EvF0YzugI';
-const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_KEY}`;
+const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_KEY}`;
 
 const SYSTEM_PROMPT = `You are Tasty, a friendly AI recipe assistant for the Tasty Recipe app.
 Your job is to:
@@ -58,31 +58,40 @@ export default function RecipeBot() {
     setLoading(true);
 
     try {
-      // Build conversation history for Gemini
-      const contents = [
-        { role: 'user', parts: [{ text: SYSTEM_PROMPT }] },
-        { role: 'model', parts: [{ text: "Understood! I'm ready to help with recipes." }] },
-        ...newMessages.map(m => ({
-          role: m.role === 'assistant' ? 'model' : 'user',
-          parts: [{ text: m.text }],
-        })),
-      ];
+      // Build conversation history (exclude the initial greeting)
+      const history = newMessages.slice(1).map(m => ({
+        role: m.role === 'assistant' ? 'model' : 'user',
+        parts: [{ text: m.text }],
+      }));
 
       const res = await fetch(API_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ contents }),
+        body: JSON.stringify({
+          system_instruction: {
+            parts: [{ text: SYSTEM_PROMPT }],
+          },
+          contents: history,
+        }),
       });
 
       const data = await res.json();
+
+      // Log error details if any
+      if (data.error) {
+        console.error('Gemini error:', data.error);
+        throw new Error(data.error.message);
+      }
+
       const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text
-        || "Sorry, I couldn't think of anything right now. Try asking again!";
+        || "I couldn't generate a response. Please try again!";
 
       setMessages(prev => [...prev, { role: 'assistant', text: reply }]);
-    } catch {
+    } catch (err) {
+      console.error('Bot error:', err);
       setMessages(prev => [...prev, {
         role: 'assistant',
-        text: "Oops! I'm having trouble connecting. Please check your Gemini API key in .env 🔑",
+        text: `Oops! Something went wrong: ${err.message || 'Unknown error'}. Please try again.`,
       }]);
     } finally {
       setLoading(false);
