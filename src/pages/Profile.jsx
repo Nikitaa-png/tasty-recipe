@@ -48,6 +48,17 @@ export default function Profile({ user, onLogout, onUpdateUser }) {
     const updated = { ...user, ...form };
     localStorage.setItem('user', JSON.stringify(updated));
     onUpdateUser(updated);
+    // re-sync form so avatar + fields reflect saved state immediately
+    setForm({
+      name:     updated.name     || '',
+      email:    updated.email    || '',
+      phone:    updated.phone    || '',
+      gender:   updated.gender   || '',
+      age:      updated.age      || '',
+      bio:      updated.bio      || '',
+      avatar:   updated.avatar   || '👨‍🍳',
+      location: updated.location || '',
+    });
     setEditing(false);
     setSaved(true);
     setTimeout(() => setSaved(false), 3000);
@@ -72,6 +83,9 @@ export default function Profile({ user, onLogout, onUpdateUser }) {
     ? form.name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2)
     : '?';
 
+  // true if the string is an emoji (not plain letters/numbers)
+  const isEmoji = (str) => /\p{Emoji}/u.test(str);
+
   return (
     <div className="profile-page">
       <Navbar user={user} onLogout={onLogout} />
@@ -83,7 +97,7 @@ export default function Profile({ user, onLogout, onUpdateUser }) {
           <div className="avatar-card">
             <div className="avatar-wrap">
               <div className="avatar-display">
-                {Array.from(form.avatar).length <= 2 ? form.avatar : initials}
+                {isEmoji(form.avatar) ? form.avatar : initials}
               </div>
               {editing && (
                 <div className="avatar-picker">

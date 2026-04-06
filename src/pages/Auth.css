@@ -86,3 +86,19 @@
   font-size: 1.1rem;
   color: var(--text2);
 }
+
+.auth-error-box {
+  background: #fee2e2;
+  color: #c0392b;
+  border: 1px solid #fca5a5;
+  border-radius: 10px;
+  padding: 0.7rem 1rem;
+  font-size: 0.88rem;
+  margin-bottom: 1rem;
+  animation: fadeInUp 0.3s ease both;
+}
+[data-theme='dark'] .auth-error-box {
+  background: #3b1212;
+  border-color: #7f1d1d;
+  color: #fca5a5;
+}

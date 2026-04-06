@@ -43,44 +43,51 @@ const normalizeMeal = (m) => ({
 
 // ── MealDB helpers ─────────────────────────────────────────────────
 const mealSearch = async (query) => {
+  const beefWords = /\b(beef|pork|bacon|ham|lard|brisket|ribs)\b/i;
   const r = await meal.get('/search.php', { params: { s: query } });
-  return (r.data.meals || []).map(normalizeMeal);
+  return (r.data.meals || [])
+    .filter(m => !beefWords.test(m.strMeal))
+    .map(normalizeMeal);
 };
 
 const mealPopular = async () => {
-  // Indian-first trending feed — no beef/pork
-  const areas = ['Indian', 'Chinese', 'Japanese', 'Mexican', 'Italian'];
-  const categories = ['Chicken', 'Seafood', 'Pasta', 'Dessert', 'Vegetarian'];
+  // Fetch Indian dishes across multiple search terms for variety
+  const indianSearches = [
+    'chicken', 'paneer', 'dal', 'biryani', 'curry',
+    'tikka', 'korma', 'samosa', 'naan', 'palak',
+  ];
 
-  // Indian gets 8 dishes, others get 2 each
-  const areaFetches = areas.map((a, idx) =>
-    meal.get('/filter.php', { params: { a } })
-      .then(r => (r.data.meals || []).slice(0, idx === 0 ? 8 : 2).map(m => ({
-        id: m.idMeal, title: m.strMeal, image: m.strMealThumb,
-        summary: '', readyInMinutes: null, servings: null, healthScore: 0,
-        cuisines: [a], dishTypes: [],
-      }))).catch(() => [])
+  // Also fetch by Indian area filter
+  const areaFetch = meal.get('/filter.php', { params: { a: 'Indian' } })
+    .then(r => (r.data.meals || []).slice(0, 12).map(m => ({
+      id: m.idMeal, title: m.strMeal, image: m.strMealThumb,
+      summary: '', readyInMinutes: null, servings: null, healthScore: 0,
+      cuisines: ['Indian'], dishTypes: [],
+    }))).catch(() => []);
+
+  // Search-based fetches for Indian dishes (returns full data with area)
+  const searchFetches = indianSearches.map(q =>
+    meal.get('/search.php', { params: { s: q } })
+      .then(r => (r.data.meals || [])
+        .filter(m => m.strArea === 'Indian')
+        .slice(0, 2)
+        .map(normalizeMeal)
+      ).catch(() => [])
   );
 
-  const catFetches = categories.map(c =>
-    meal.get('/filter.php', { params: { c } })
-      .then(r => (r.data.meals || []).slice(0, 2).map(m => ({
-        id: m.idMeal, title: m.strMeal, image: m.strMealThumb,
-        summary: '', readyInMinutes: null, servings: null, healthScore: 0,
-        cuisines: [], dishTypes: [c],
-      }))).catch(() => [])
-  );
+  const [areaResults, ...searchResults] = await Promise.all([areaFetch, ...searchFetches]);
 
-  const all = await Promise.all([...areaFetches, ...catFetches]);
-
+  // Merge, deduplicate, filter out any beef/pork by title
+  const beefWords = /\b(beef|pork|bacon|ham|lard|brisket|ribs)\b/i;
   const seen = new Set();
-  const flat = all.flat().filter(m => {
+  const all = [...areaResults, ...searchResults.flat()].filter(m => {
     if (seen.has(m.id)) return false;
+    if (beefWords.test(m.title)) return false;
     seen.add(m.id);
     return true;
   });
 
-  return flat.slice(0, 24);
+  return all.slice(0, 24);
 };
 
 const mealById = async (id) => {
