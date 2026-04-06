@@ -64,9 +64,9 @@ export default function Footer() {
           Made with ❤️ and lots of 🍛 · © {year} Tasty Recipe
         </div>
         <div className="footer-bottom-right">
-          <span>🔒 Privacy Policy</span>
-          <span>📄 Terms of Use</span>
-          <span>📬 Contact Us</span>
+          <span onClick={() => navigate('/privacy')}>🔒 Privacy Policy</span>
+          <span onClick={() => navigate('/terms')}>📄 Terms of Use</span>
+          <span onClick={() => navigate('/contact')}>📬 Contact Us</span>
         </div>
       </div>
     </footer>

@@ -12,6 +12,7 @@ import Profile from './pages/Profile';
 import Community from './pages/Community';
 import CommunityDetail from './pages/CommunityDetail';
 import AddRecipe from './pages/AddRecipe';
+import Legal from './pages/Legal';
 import RecipeBot from './components/RecipeBot';
 import './App.css';
 
@@ -84,6 +85,9 @@ function App() {
         <Route path="/community"  element={guard(<Community user={user} onLogout={handleLogout} />)} />
         <Route path="/community/:id" element={guard(<CommunityDetail user={user} onLogout={handleLogout} />)} />
         <Route path="/add-recipe" element={guard(<AddRecipe user={user} onLogout={handleLogout} />)} />
+        <Route path="/privacy"    element={<Legal page="privacy" user={user} onLogout={handleLogout} />} />
+        <Route path="/terms"      element={<Legal page="terms"   user={user} onLogout={handleLogout} />} />
+        <Route path="/contact"    element={<Legal page="contact" user={user} onLogout={handleLogout} />} />
         <Route path="*"           element={<Navigate to="/" replace />} />
       </Routes>
       {user && <RecipeBot />}
