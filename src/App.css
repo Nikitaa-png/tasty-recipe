@@ -48,7 +48,7 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
-  font-family: 'Pacifico', 'Segoe UI', system-ui, sans-serif;
+  font-family: 'Nunito', 'Segoe UI', system-ui, sans-serif;
   background: var(--bg);
   color: var(--text);
   transition: background 0.4s, color 0.4s;
