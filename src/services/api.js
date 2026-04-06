@@ -51,46 +51,26 @@ const mealSearch = async (query) => {
 };
 
 const mealPopular = async () => {
-  // Hardcoded popular Indian dish IDs from MealDB — guaranteed Indian, no beef
-  const indianIds = [
-    '52765', // Chicken Tikka Masala
-    '52772', // Chicken Handi
-    '52785', // Dal fry
-    '52795', // Chicken Biryani
-    '52804', // Poutine (skip — use search instead)
-    '52869', // Biryani
-    '53049', // Chicken Karahi
-    '52846', // Chicken Congee
-    '52958', // Lamb Rogan Josh
-    '52959', // Lamb Saag
-  ];
+  const beefWords = /\b(beef|pork|bacon|ham|lard|brisket|ribs)\b/i;
 
-  // Best approach: search for specific Indian dishes by name
-  const indianDishes = [
-    'Chicken Tikka Masala', 'Biryani', 'Dal Fry', 'Palak Paneer',
-    'Butter Chicken', 'Chicken Korma', 'Samosa', 'Aloo Gobi',
-    'Chicken Vindaloo', 'Lamb Rogan Josh', 'Paneer Tikka',
-    'Chicken Madras', 'Saag', 'Dhal', 'Chicken Handi',
-    'Lamb Saag', 'Chicken Jalfrezi', 'Tarka Dal', 'Matar Paneer', 'Chicken Dopiaza',
-  ];
+  // Step 1: get all Indian dishes from area filter (returns id + title + image)
+  const areaRes = await meal.get('/filter.php', { params: { a: 'Indian' } }).catch(() => ({ data: { meals: [] } }));
+  const indianList = (areaRes.data.meals || []).filter(m => !beefWords.test(m.strMeal));
 
-  const fetches = indianDishes.map(name =>
-    meal.get('/search.php', { params: { s: name } })
-      .then(r => {
-        const found = (r.data.meals || []).find(m => m.strArea === 'Indian');
-        return found ? normalizeMeal(found) : null;
-      })
-      .catch(() => null)
+  // Step 2: enrich first 20 with full details (image, instructions, etc.)
+  const enriched = await Promise.all(
+    indianList.slice(0, 20).map(m =>
+      meal.get('/lookup.php', { params: { i: m.idMeal } })
+        .then(r => r.data.meals?.[0] ? normalizeMeal(r.data.meals[0]) : null)
+        .catch(() => ({
+          id: m.idMeal, title: m.strMeal, image: m.strMealThumb,
+          summary: '', readyInMinutes: null, servings: null, healthScore: 0,
+          cuisines: ['Indian'], dishTypes: [],
+        }))
+    )
   );
 
-  const results = await Promise.all(fetches);
-
-  const seen = new Set();
-  return results.filter(m => {
-    if (!m || seen.has(m.id)) return false;
-    seen.add(m.id);
-    return true;
-  });
+  return enriched.filter(Boolean);
 };
 
 const mealById = async (id) => {
