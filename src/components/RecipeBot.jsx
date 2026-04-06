@@ -5,9 +5,10 @@ import './RecipeBot.css';
 const GROQ_KEY  = import.meta.env.VITE_GROQ_KEY || '';
 const GROQ_URL  = 'https://api.groq.com/openai/v1/chat/completions';
 
-// Gemini for image vision
+// Gemini for image vision + text fallback
 const GEMINI_KEY = import.meta.env.VITE_GEMINI_KEY || 'AIzaSyApS2z-ySIfHD18qkJnExJxPiCawEppi6s';
-const GEMINI_URL = `https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent?key=${GEMINI_KEY}`;
+const GEMINI_CHAT_URL = `https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent?key=${GEMINI_KEY}`;
+const GEMINI_URL      = GEMINI_CHAT_URL;
 
 const SYSTEM_PROMPT = `You are Tasty 🍴, a friendly AI recipe assistant for the Tasty Recipe app.
 Your job:
@@ -116,6 +117,11 @@ Keep it friendly and use emojis. If it's not food, say so politely.`,
 
   // ── Send text to Groq ──
   const sendToGroq = async (newMessages) => {
+    // If no Groq key, fall back to Gemini for text
+    if (!GROQ_KEY) {
+      return sendToGeminiText(newMessages);
+    }
+
     const chatMessages = [
       { role: 'system', content: SYSTEM_PROMPT },
       ...newMessages.map(m => ({
@@ -140,9 +146,31 @@ Keep it friendly and use emojis. If it's not food, say so politely.`,
 
     const data = await res.json();
     if (!res.ok || data.error) {
+      // Fall back to Gemini on auth error
+      if (res.status === 401) return sendToGeminiText(newMessages);
       throw new Error(`${res.status} ${data.error?.message || 'Unknown error'}`);
     }
     return data?.choices?.[0]?.message?.content || "I couldn't generate a response.";
+  };
+
+  // Gemini text fallback
+  const sendToGeminiText = async (newMessages) => {
+    const history = [
+      { role: 'user',  parts: [{ text: SYSTEM_PROMPT }] },
+      { role: 'model', parts: [{ text: "Got it! I'm Tasty, your recipe assistant." }] },
+      ...newMessages.slice(1).map(m => ({
+        role: m.role === 'assistant' ? 'model' : 'user',
+        parts: [{ text: m.text }],
+      })),
+    ];
+    const res  = await fetch(GEMINI_CHAT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ contents: history }),
+    });
+    const data = await res.json();
+    if (data.error) throw new Error(data.error.message);
+    return data?.candidates?.[0]?.content?.parts?.[0]?.text || "I couldn't generate a response.";
   };
 
   // ── Main send handler ──
