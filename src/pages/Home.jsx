@@ -80,6 +80,7 @@ export default function Home({ user, onLogout }) {
   const [searched, setSearched]             = useState(false);
   const [placeholderIdx, setPlaceholderIdx] = useState(0);
   const [heroVisible, setHeroVisible]       = useState(false);
+  const [dietFilter, setDietFilter]         = useState('all'); // 'all' | 'veg' | 'nonveg'
 
   const resultsRef                    = useRef(null);
   const [statsRef,   statsVisible]    = useReveal(0.2);
@@ -149,6 +150,20 @@ export default function Home({ user, onLogout }) {
     activeTab === 'favorites' ? favorites :
     activeTab === 'search'    ? searchResults :
     popularRecipes;
+
+  // Non-veg keywords for detection
+  const NON_VEG_WORDS = /\b(chicken|mutton|lamb|fish|prawn|shrimp|beef|pork|meat|egg|turkey|duck|crab|lobster|tuna|salmon|sardine|anchovy|bacon|sausage|keema|mince)\b/i;
+
+  const applyDietFilter = (list) => {
+    if (dietFilter === 'all') return list;
+    return list.filter(r => {
+      const text = `${r.title} ${r.summary || ''} ${(r.dishTypes || []).join(' ')}`;
+      const isNonVeg = NON_VEG_WORDS.test(text);
+      return dietFilter === 'veg' ? !isNonVeg : isNonVeg;
+    });
+  };
+
+  const filteredRecipes = applyDietFilter(displayRecipes);
 
   return (
     <div className="home-page">
@@ -277,6 +292,23 @@ export default function Home({ user, onLogout }) {
           ))}
         </div>
 
+        {/* Veg / Non-veg filter */}
+        <div className="diet-filter">
+          {[
+            { key: 'all',    label: 'All',     icon: '🍽️' },
+            { key: 'veg',    label: 'Veg',     icon: '🥦' },
+            { key: 'nonveg', label: 'Non-Veg', icon: '🍗' },
+          ].map(f => (
+            <button
+              key={f.key}
+              className={`diet-btn ${dietFilter === f.key ? `active ${f.key}` : ''}`}
+              onClick={() => setDietFilter(f.key)}
+            >
+              <span>{f.icon}</span> {f.label}
+            </button>
+          ))}
+        </div>
+
         {loading && (
           <div className="skel-grid">
             {Array.from({ length: 12 }).map((_, i) => (
@@ -318,15 +350,15 @@ export default function Home({ user, onLogout }) {
           </div>
         )}
 
-        {!loading && displayRecipes.length > 0 && (
+        {!loading && filteredRecipes.length > 0 && (
           <div ref={gridRef}>
             {activeTab === 'search' && (
               <p className="results-label">
-                Found <strong>{searchResults.length}</strong> recipes for "<em>{lastQuery}</em>"
+                Found <strong>{filteredRecipes.length}</strong> recipes for "<em>{lastQuery}</em>"
               </p>
             )}
             <div className="recipe-grid">
-              {displayRecipes.map((r, i) => (
+              {filteredRecipes.map((r, i) => (
                 <div
                   key={r.id}
                   className={`card-wrap ${gridVisible ? 'card-in' : 'card-in'}`}
@@ -336,6 +368,14 @@ export default function Home({ user, onLogout }) {
                 </div>
               ))}
             </div>
+          </div>
+        )}
+
+        {!loading && !error && filteredRecipes.length === 0 && displayRecipes.length > 0 && (
+          <div className="empty-box">
+            <div className="empty-icon">{dietFilter === 'veg' ? '🥦' : '🍗'}</div>
+            <h3>No {dietFilter === 'veg' ? 'vegetarian' : 'non-vegetarian'} dishes found</h3>
+            <p>Try switching the filter or searching something else.</p>
           </div>
         )}
 

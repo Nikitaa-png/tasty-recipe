@@ -184,3 +184,27 @@
   .stats-row{flex-wrap:wrap;} .stat-card{flex:1 1 45%;border-right:none;border-bottom:1px solid var(--border);}
   .home-hero{padding:2.5rem 1rem 0;} .home-body{padding:1.2rem;} .cuisine-row{padding:0.8rem 1rem;}
 }
+/* ══ DIET FILTER ══ */
+.diet-filter {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+.diet-btn {
+  display: flex; align-items: center; gap: 0.4rem;
+  padding: 0.45rem 1.2rem;
+  border-radius: 50px;
+  border: 2px solid var(--border);
+  background: var(--surface);
+  color: var(--text2);
+  font-size: 0.88rem; font-weight: 700;
+  cursor: pointer;
+  transition: all 0.22s;
+  font-family: 'Nunito', sans-serif;
+}
+.diet-btn:hover { transform: translateY(-2px); border-color: var(--accent2); color: var(--text); }
+.diet-btn.active.all    { background: var(--accent);  color: #fff; border-color: var(--accent);  box-shadow: 0 4px 12px var(--shadow); }
+.diet-btn.active.veg    { background: #16a34a; color: #fff; border-color: #16a34a; box-shadow: 0 4px 12px rgba(22,163,74,0.3); }
+.diet-btn.active.nonveg { background: #dc2626; color: #fff; border-color: #dc2626; box-shadow: 0 4px 12px rgba(220,38,38,0.3); }
