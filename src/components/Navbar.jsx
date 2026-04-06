@@ -36,6 +36,7 @@ export default function Navbar({ user, onLogout }) {
       <div className={`nav-links ${menuOpen ? 'open' : ''}`}>
         <Link to="/home" className={isActive('/home')}>🏠 Home</Link>
         <Link to="/home?tab=popular" className={isActive('/home', 'popular')}>🔥 Popular</Link>
+        <Link to="/community" className={isActive('/community')}>👨‍🍳 Community</Link>
 
         {/* Favourites — shows badge with count */}
         <Link to="/home?tab=favorites" className={`nav-link fav-nav-link ${isActive('/home', 'favorites') === 'nav-link active' ? 'active' : ''}`}>

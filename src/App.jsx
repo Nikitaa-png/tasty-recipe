@@ -9,6 +9,9 @@ import Signup from './pages/Signup';
 import Home from './pages/Home';
 import RecipeDetail from './pages/RecipeDetail';
 import Profile from './pages/Profile';
+import Community from './pages/Community';
+import CommunityDetail from './pages/CommunityDetail';
+import AddRecipe from './pages/AddRecipe';
 import './App.css';
 
 function App() {
@@ -77,6 +80,9 @@ function App() {
         <Route path="/home"       element={guard(<Home user={user} onLogout={handleLogout} />)} />
         <Route path="/recipe/:id" element={guard(<RecipeDetail user={user} onLogout={handleLogout} />)} />
         <Route path="/profile"    element={guard(<Profile user={user} onLogout={handleLogout} onUpdateUser={handleUpdateUser} />)} />
+        <Route path="/community"  element={guard(<Community user={user} onLogout={handleLogout} />)} />
+        <Route path="/community/:id" element={guard(<CommunityDetail user={user} onLogout={handleLogout} />)} />
+        <Route path="/add-recipe" element={guard(<AddRecipe user={user} onLogout={handleLogout} />)} />
         <Route path="*"           element={<Navigate to="/" replace />} />
       </Routes>
     </ThemeProvider>

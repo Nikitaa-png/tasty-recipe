@@ -1,0 +1,127 @@
+.add-recipe-page { min-height: 100vh; background: var(--bg); }
+
+.add-recipe-container {
+  max-width: 820px; margin: 0 auto; padding: 2rem;
+}
+
+.add-recipe-header {
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border);
+}
+.add-recipe-header h1 {
+  font-size: 1.8rem; font-weight: 900; color: var(--text); margin-bottom: 0.4rem;
+}
+.add-recipe-header p { color: var(--text2); font-size: 0.95rem; }
+
+/* Form sections */
+.rf-section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  animation: fadeInUp 0.4s ease both;
+}
+.rf-heading {
+  font-size: 1rem; font-weight: 800; color: var(--text);
+  margin-bottom: 0.3rem;
+}
+.rf-sub { font-size: 0.82rem; color: var(--text2); margin-bottom: 1rem; }
+
+.rf-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+.rf-field { display: flex; flex-direction: column; gap: 0.35rem; }
+.rf-field.full { grid-column: 1 / -1; }
+.rf-field label { font-size: 0.84rem; font-weight: 700; color: var(--text2); }
+.req { color: var(--accent); }
+.optional { color: var(--text2); font-weight: 400; font-size: 0.78rem; }
+
+.rf-input {
+  background: var(--input-bg);
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  padding: 0.7rem 0.9rem;
+  font-size: 0.92rem; color: var(--text);
+  outline: none; width: 100%;
+  font-family: 'Nunito', sans-serif;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.rf-input::placeholder { color: var(--placeholder); }
+.rf-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--shadow); }
+.rf-input.err { border-color: #e74c3c; }
+.rf-textarea { resize: vertical; min-height: 80px; }
+.rf-step-input { resize: vertical; min-height: 60px; flex: 1; }
+
+.rf-char { font-size: 0.75rem; color: var(--text2); text-align: right; }
+.rf-hint { font-size: 0.76rem; color: var(--text2); }
+.rf-error { font-size: 0.8rem; color: #e74c3c; font-weight: 600; }
+.rf-submit-error {
+  background: #fee2e2; color: #c0392b;
+  border: 1px solid #fca5a5; border-radius: 10px;
+  padding: 0.8rem 1rem; margin-bottom: 1rem; font-size: 0.9rem;
+}
+
+/* Ingredients */
+.ingredients-list { display: flex; flex-direction: column; gap: 0.6rem; margin-bottom: 0.8rem; }
+.ingredient-row { display: flex; align-items: center; gap: 0.6rem; }
+.ing-num {
+  min-width: 26px; height: 26px;
+  background: var(--accent); color: #fff;
+  border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  font-size: 0.75rem; font-weight: 700; flex-shrink: 0;
+}
+.ing-remove {
+  background: none; border: 1.5px solid var(--border);
+  border-radius: 50%; width: 28px; height: 28px;
+  cursor: pointer; color: var(--text2); font-size: 0.75rem;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s; flex-shrink: 0;
+}
+.ing-remove:hover { background: #fee2e2; border-color: #e74c3c; color: #e74c3c; }
+
+/* Steps */
+.steps-list { display: flex; flex-direction: column; gap: 0.8rem; margin-bottom: 0.8rem; }
+.step-row { display: flex; align-items: flex-start; gap: 0.7rem; }
+.step-num-badge {
+  min-width: 30px; height: 30px;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  color: #fff; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.82rem; font-weight: 800; flex-shrink: 0; margin-top: 0.4rem;
+}
+
+.add-more-btn {
+  background: none; border: 1.5px dashed var(--border);
+  border-radius: 10px; padding: 0.55rem 1.2rem;
+  font-size: 0.88rem; font-weight: 700; color: var(--accent);
+  cursor: pointer; width: 100%; transition: all 0.2s;
+  font-family: 'Nunito', sans-serif;
+}
+.add-more-btn:hover { background: var(--surface2); border-color: var(--accent); }
+
+/* Actions */
+.rf-actions {
+  display: flex; gap: 1rem; justify-content: flex-end;
+  padding-top: 1rem;
+}
+.rf-submit { padding: 0.8rem 2.5rem; font-size: 1rem; }
+
+/* Success */
+.success-screen {
+  text-align: center; padding: 6rem 2rem;
+  animation: fadeInUp 0.5s ease both;
+}
+.success-icon { font-size: 4rem; margin-bottom: 1rem; animation: pulse 1s ease 3; }
+.success-screen h2 { font-size: 1.8rem; color: var(--text); margin-bottom: 0.5rem; }
+.success-screen p  { color: var(--text2); }
+
+@media (max-width: 600px) {
+  .rf-grid-2 { grid-template-columns: 1fr; }
+  .rf-field.full { grid-column: 1; }
+  .rf-actions { flex-direction: column; }
+  .rf-submit { width: 100%; }
+}
