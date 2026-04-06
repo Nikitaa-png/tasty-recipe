@@ -100,7 +100,7 @@ export default function Home({ user, onLogout }) {
   const loadPopular = useCallback(async () => {
     setLoading(true); setError('');
     try {
-      const data = await getPopularRecipes(24);
+      const data = await getPopularRecipes(40);
       setPopularRecipes(data);
     } catch (err) {
       const s = err?.response?.status;

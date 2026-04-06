@@ -53,13 +53,27 @@ const mealSearch = async (query) => {
 const mealPopular = async () => {
   const beefWords = /\b(beef|pork|bacon|ham|lard|brisket|ribs)\b/i;
 
-  // Step 1: get all Indian dishes from area filter (returns id + title + image)
+  // Fetch ALL Indian dishes from area filter
   const areaRes = await meal.get('/filter.php', { params: { a: 'Indian' } }).catch(() => ({ data: { meals: [] } }));
   const indianList = (areaRes.data.meals || []).filter(m => !beefWords.test(m.strMeal));
 
-  // Step 2: enrich first 20 with full details (image, instructions, etc.)
-  const enriched = await Promise.all(
-    indianList.slice(0, 20).map(m =>
+  // Also fetch from other popular areas to pad up to 40 total
+  const extraAreas = ['Chinese', 'Japanese', 'Mexican', 'Italian', 'Thai'];
+  const extraFetches = extraAreas.map(a =>
+    meal.get('/filter.php', { params: { a } })
+      .then(r => (r.data.meals || []).slice(0, 4).map(m => ({
+        id: m.idMeal, title: m.strMeal, image: m.strMealThumb,
+        summary: '', readyInMinutes: null, servings: null, healthScore: 0,
+        cuisines: [a], dishTypes: [],
+      }))).catch(() => [])
+  );
+
+  const extraResults = await Promise.all(extraFetches);
+  const extraFlat = extraResults.flat().filter(m => !beefWords.test(m.title));
+
+  // Enrich ALL Indian dishes with full details (parallel)
+  const enrichedIndian = await Promise.all(
+    indianList.map(m =>
       meal.get('/lookup.php', { params: { i: m.idMeal } })
         .then(r => r.data.meals?.[0] ? normalizeMeal(r.data.meals[0]) : null)
         .catch(() => ({
@@ -70,7 +84,13 @@ const mealPopular = async () => {
     )
   );
 
-  return enriched.filter(Boolean);
+  // Combine: all Indian first, then extras
+  const seen = new Set();
+  return [...enrichedIndian, ...extraFlat].filter(m => {
+    if (!m || seen.has(m.id)) return false;
+    seen.add(m.id);
+    return true;
+  });
 };
 
 const mealById = async (id) => {
