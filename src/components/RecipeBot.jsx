@@ -1,16 +1,16 @@
 import { useState, useRef, useEffect } from 'react';
 import './RecipeBot.css';
 
-const GEMINI_KEY = import.meta.env.VITE_GEMINI_KEY || 'AIzaSyDbVREIhMW64-aw0A01KUArR9EvF0YzugI';
-const API_URL = `https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent?key=${GEMINI_KEY}`;
+const GROQ_KEY = import.meta.env.VITE_GROQ_KEY || '';
+const API_URL  = 'https://api.groq.com/openai/v1/chat/completions';
 
-const SYSTEM_PROMPT = `You are Tasty, a friendly AI recipe assistant for the Tasty Recipe app.
-Your job is to:
+const SYSTEM_PROMPT = `You are Tasty 🍴, a friendly AI recipe assistant for the Tasty Recipe app.
+Your job:
 - Suggest recipes based on ingredients the user has
-- Help users find Indian and international dishes
+- Help find Indian and international dishes
 - Recommend trending, easy, or quick recipes
 - Give short cooking tips and substitutions
-- Answer questions about cooking techniques
+- Answer cooking technique questions
 
 Rules:
 - Keep responses concise and friendly (max 150 words)
@@ -22,7 +22,7 @@ Rules:
 const QUICK_PROMPTS = [
   '🍛 Easy Indian recipes',
   '🥗 Quick 15-min meals',
-  '🧅 What can I make with onion, tomato, potato?',
+  '🧅 I have onion, tomato, potato — what can I make?',
   '🔥 Trending dishes right now',
   '🌱 Vegetarian dinner ideas',
 ];
@@ -58,30 +58,36 @@ export default function RecipeBot() {
     setLoading(true);
 
     try {
-      // Build conversation — system prompt as first user turn for v1 compatibility
-      const history = [
-        { role: 'user',  parts: [{ text: SYSTEM_PROMPT }] },
-        { role: 'model', parts: [{ text: "Got it! I'm Tasty, your recipe assistant. How can I help?" }] },
-        ...newMessages.slice(1).map(m => ({
-          role: m.role === 'assistant' ? 'model' : 'user',
-          parts: [{ text: m.text }],
+      // Groq uses OpenAI-compatible chat format
+      const chatMessages = [
+        { role: 'system', content: SYSTEM_PROMPT },
+        ...newMessages.map(m => ({
+          role: m.role === 'assistant' ? 'assistant' : 'user',
+          content: m.text,
         })),
       ];
 
       const res = await fetch(API_URL, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ contents: history }),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${GROQ_KEY}`,
+        },
+        body: JSON.stringify({
+          model: 'llama-3.1-8b-instant',
+          messages: chatMessages,
+          max_tokens: 300,
+          temperature: 0.7,
+        }),
       });
 
       const data = await res.json();
 
       if (data.error) {
-        console.error('Gemini error:', data.error);
         throw new Error(data.error.message);
       }
 
-      const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text
+      const reply = data?.choices?.[0]?.message?.content
         || "I couldn't generate a response. Please try again!";
 
       setMessages(prev => [...prev, { role: 'assistant', text: reply }]);
@@ -89,7 +95,7 @@ export default function RecipeBot() {
       console.error('Bot error:', err);
       setMessages(prev => [...prev, {
         role: 'assistant',
-        text: `Oops! ${err.message || 'Something went wrong'}. Please try again.`,
+        text: "Oops! Something went wrong. Please check your Groq API key 🔑",
       }]);
     } finally {
       setLoading(false);
