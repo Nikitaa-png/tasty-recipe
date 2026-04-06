@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import Navbar from '../components/Navbar';
 import RecipeCard from '../components/RecipeCard';
+import Footer from '../components/Footer';
 import { searchRecipes, getPopularRecipes } from '../services/api';
 import { useTheme } from '../context/ThemeContext';
 import './Home.css';
@@ -375,6 +376,7 @@ export default function Home({ user, onLogout }) {
           </div>
         )}
       </div>
+      <Footer />
     </div>
   );
 }
