@@ -185,3 +185,75 @@
   .detail-hero { height: 300px; }
   .detail-body { padding: 1.2rem; }
 }
+
+/* ── Loading Skeleton ── */
+.detail-skeleton { animation: fadeIn 0.3s ease both; }
+
+.ds-hero {
+  height: 420px;
+  width: 100%;
+}
+
+.ds-body {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+.ds-title {
+  height: 36px;
+  width: 60%;
+  border-radius: 10px;
+}
+
+.ds-meta {
+  display: flex;
+  gap: 0.8rem;
+}
+
+.ds-chip {
+  height: 28px;
+  width: 90px;
+  border-radius: 50px;
+}
+
+.ds-tabs {
+  display: flex;
+  gap: 0.6rem;
+}
+
+.ds-tab {
+  height: 38px;
+  width: 130px;
+  border-radius: 50px;
+}
+
+.ds-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 0.8rem;
+  margin-top: 0.5rem;
+}
+
+.ds-ing {
+  height: 64px;
+  border-radius: 14px;
+}
+
+.shimmer {
+  background: linear-gradient(90deg, var(--surface2) 25%, var(--border) 50%, var(--surface2) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+}
+
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+@media (max-width: 600px) {
+  .ds-hero { height: 260px; }
+}

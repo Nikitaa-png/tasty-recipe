@@ -41,7 +41,27 @@ export default function RecipeDetail({ user, onLogout }) {
   if (loading) return (
     <div className="detail-page">
       <Navbar user={user} onLogout={onLogout} />
-      <div className="spinner" style={{ marginTop: '4rem' }} />
+      <div className="detail-skeleton">
+        {/* Hero skeleton */}
+        <div className="ds-hero shimmer" />
+        <div className="ds-body">
+          <div className="ds-title shimmer" />
+          <div className="ds-meta">
+            <div className="ds-chip shimmer" />
+            <div className="ds-chip shimmer" />
+            <div className="ds-chip shimmer" />
+          </div>
+          <div className="ds-tabs">
+            <div className="ds-tab shimmer" />
+            <div className="ds-tab shimmer" />
+          </div>
+          <div className="ds-grid">
+            {Array.from({ length: 8 }).map((_, i) => (
+              <div key={i} className="ds-ing shimmer" />
+            ))}
+          </div>
+        </div>
+      </div>
     </div>
   );
 

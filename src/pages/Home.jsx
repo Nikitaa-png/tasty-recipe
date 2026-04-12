@@ -310,17 +310,20 @@ export default function Home({ user, onLogout }) {
         </div>
 
         {loading && (
-          <div className="skel-grid">
-            {Array.from({ length: 12 }).map((_, i) => (
-              <div key={i} className="skel-card" style={{ '--si': i }}>
-                <div className="skel-img shimmer" />
-                <div className="skel-body">
-                  <div className="skel-line shimmer" style={{ width: '80%' }} />
-                  <div className="skel-line shimmer" style={{ width: '60%' }} />
-                  <div className="skel-line shimmer" style={{ width: '40%' }} />
+          <div>
+            <p className="loading-label">🍛 Loading delicious recipes…</p>
+            <div className="skel-grid">
+              {Array.from({ length: 12 }).map((_, i) => (
+                <div key={i} className="skel-card" style={{ '--si': i }}>
+                  <div className="skel-img shimmer" />
+                  <div className="skel-body">
+                    <div className="skel-line shimmer" style={{ width: '80%' }} />
+                    <div className="skel-line shimmer" style={{ width: '60%' }} />
+                    <div className="skel-line shimmer" style={{ width: '40%' }} />
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         )}
 
