@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
+import { createUserWithEmailAndPassword, updateProfile, signOut } from 'firebase/auth';
 import { auth } from '../services/firebase';
 import { useTheme } from '../context/ThemeContext';
 import './Auth.css';
@@ -23,6 +23,9 @@ export default function Signup({ onLogin }) {
   const [showPw, setShowPw] = useState(false);
   const [loading, setLoading] = useState(false);
   const [authError, setAuthError] = useState('');
+
+  // Clear any existing session so new user can register fresh
+  useEffect(() => { signOut(auth).catch(() => {}); }, []);
 
   const validate = () => {
     const e = {};

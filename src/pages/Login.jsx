@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { signInWithEmailAndPassword } from 'firebase/auth';
+import { signInWithEmailAndPassword, signOut } from 'firebase/auth';
 import { auth } from '../services/firebase';
 import { useTheme } from '../context/ThemeContext';
 import './Auth.css';
@@ -21,11 +21,14 @@ const friendlyError = (code) => {
 export default function Login({ onLogin }) {
   const navigate = useNavigate();
   const { theme, toggleTheme } = useTheme();
-  const [form, setForm]     = useState({ email: '', password: '' });
-  const [errors, setErrors] = useState({});
-  const [showPw, setShowPw] = useState(false);
+  const [form, setForm]       = useState({ email: '', password: '' });
+  const [errors, setErrors]   = useState({});
+  const [showPw, setShowPw]   = useState(false);
   const [loading, setLoading] = useState(false);
   const [authError, setAuthError] = useState('');
+
+  // Clear any existing session so the form is always shown fresh
+  useEffect(() => { signOut(auth).catch(() => {}); }, []);
 
   const validate = () => {
     const e = {};

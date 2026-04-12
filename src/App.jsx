@@ -77,8 +77,8 @@ function App() {
     <ThemeProvider>
       <Routes>
         <Route path="/"           element={<Landing />} />
-        <Route path="/login"      element={user ? <Navigate to="/home" replace /> : <Login onLogin={handleLogin} />} />
-        <Route path="/signup"     element={user ? <Navigate to="/home" replace /> : <Signup onLogin={handleLogin} />} />
+        <Route path="/login"      element={<Login onLogin={handleLogin} />} />
+        <Route path="/signup"     element={<Signup onLogin={handleLogin} />} />
         <Route path="/home"       element={guard(<Home user={user} onLogout={handleLogout} />)} />
         <Route path="/recipe/:id" element={guard(<RecipeDetail user={user} onLogout={handleLogout} />)} />
         <Route path="/profile"    element={guard(<Profile user={user} onLogout={handleLogout} onUpdateUser={handleUpdateUser} />)} />
